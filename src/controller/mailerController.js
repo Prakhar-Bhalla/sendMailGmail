@@ -64,7 +64,7 @@ router.post("/", async(req,res) => {
                 {
                     return sendMail();
                 }
-                if(time.trim().split(" ")[1] === "hour")
+                if(time.trim().split(" ")[1] === "hour" || time.trim().split(" ")[1] === "hours")
                 {
                     delay = 1000 * 60 * 60 * (+(time.trim().split(" ")[0]));
                 }
@@ -91,7 +91,7 @@ router.post("/", async(req,res) => {
                 sendMail();
                 return res.status(201).send(`Mails set into queue successfully`);
             }
-            if(time.trim().split(" ")[1] === "hour")
+            if(time.trim().split(" ")[1] === "hour" || time.trim().split(" ")[1] === "hours")
             {
                 delay = 1000 * 60 * 60 * (+(time.trim().split(" ")[0]));
             }
