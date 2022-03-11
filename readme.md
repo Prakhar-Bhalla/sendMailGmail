@@ -1,3 +1,6 @@
+// To install all modules
+write npm init in terminal and press enter.
+
 // To run the code
 write node .\src\server.js in terminal and press enter.
 

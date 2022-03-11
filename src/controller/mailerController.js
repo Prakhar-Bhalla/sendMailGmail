@@ -1,6 +1,7 @@
 const express = require("express");
 const sendmail = require("../util/mail");
 const router = express.Router();
+const { body, validationResult } = require('express-validator');
 
 const convert = (d) => {
     let date = "";
@@ -50,7 +51,14 @@ const convert = (d) => {
 }
 
 
-router.post("/", async(req,res) => {
+router.post("/", body("email").isEmail().withMessage("Enter valid email"), async(req,res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        let err = errors.array().map(e => {
+            return e.msg;
+        })
+      return res.status(400).send({errors : err});
+    }
     try {
         if(Array.isArray(req.body))
         {
