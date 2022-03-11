@@ -10,6 +10,6 @@ module.exports = (from, to, subject, text, html) => {
     };
     
     transporter.sendMail(message,(err, info) => {
-        console.log(err);
+        console.log(info);
     });
 }

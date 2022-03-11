@@ -45,36 +45,66 @@ const convert = (d) => {
         }
     }
     date += clock;
-    console.log(date);
     let schedule = new Date(date);
     return schedule.valueOf();
 }
 
+
 router.post("/", async(req,res) => {
     try {
-        const sendMail = () => {
-            console.log("here");
-            sendmail("prakharbhalla2016@gmail.com", req.body.email, req.body.Subject, req.body.body, "");
-        }
-        let time = req.body.Time;
-        let delay;
-        if(time === "now")
+        if(Array.isArray(req.body))
         {
-            delay = 0;
+            req.body.forEach(el => {
+                const sendMail = () => {
+                    sendmail("prakharbhalla2016@gmail.com", el.email, el.Subject, el.body, "");
+                }
+                let time = el.Time;
+                let delay;
+                if(time === "now")
+                {
+                    return sendMail();
+                }
+                if(time.trim().split(" ")[1] === "hour")
+                {
+                    delay = 1000 * 60 * 60 * (+(time.trim().split(" ")[0]));
+                }
+                else 
+                {
+                    let schedule = convert(time);
+                    let present = Date.now();
+                    delay = schedule - present - (5.5*60*60*1000);
+                }
+                console.log("d:", delay/1000);
+                setTimeout(sendMail, delay);
+            });
         }
-        if(time.trim().split(" ")[1] === "hour")
+        else
         {
-            delay = 1000 * 60 * 60 * (+(time.trim().split(" ")[0]));
+            const sendMail = () => {
+                console.log("here");
+                sendmail("prakharbhalla2016@gmail.com", req.body.email, req.body.Subject, req.body.body, "");
+            }
+            let time = req.body.Time;
+            let delay;
+            if(time === "now")
+            {
+                sendMail();
+                return res.status(201).send(`Mails set into queue successfully`);
+            }
+            if(time.trim().split(" ")[1] === "hour")
+            {
+                delay = 1000 * 60 * 60 * (+(time.trim().split(" ")[0]));
+            }
+            else 
+            {
+                let schedule = convert(time);
+                let present = Date.now();
+                delay = schedule - present - (5.5*60*60*1000);
+            }
+            console.log("delay in sec:", delay/1000);
+            setTimeout(sendMail, delay);
         }
-        else 
-        {
-            let schedule = convert(time);
-            let present = Date.now();
-            delay = schedule - present - (5.5*60*60*1000);
-        }
-        console.log("d:", delay/1000);
-        setTimeout(sendMail, delay);
-        res.status(201).send(`Mail sent to ${req.body.email}`);
+        res.status(201).send(`Mails set into queue successfully`);
     } catch(e) {
         res.status(500).send("Something went wrong");
     }
