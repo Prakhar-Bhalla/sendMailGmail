@@ -1,8 +1,8 @@
 // To install all modules
-write npm init in terminal and press enter.
+Type npm init in terminal and press enter.
 
 // To run the code
-write node .\src\server.js in terminal and press enter.
+Type node .\src\server.js in terminal and press enter.
 
 // To post request through postman
 send a POST request on http://localhost:2356/sendmail with body in json form as follows:

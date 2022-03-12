@@ -1,8 +1,8 @@
 const express = require("express");
 const sendmail = require("../util/mail");
 const router = express.Router();
-const { body, validationResult } = require('express-validator');
 
+// function to convert input date to milliseconds since 1 jan 1970
 const convert = (d) => {
     let date = "";
     let x = d.trim().split(",");
@@ -51,21 +51,17 @@ const convert = (d) => {
 }
 
 
-router.post("/", body("email").isEmail().withMessage("Enter valid email"), async(req,res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        let err = errors.array().map(e => {
-            return e.msg;
-        })
-      return res.status(400).send({errors : err});
-    }
+router.post("/", async(req,res) => {
     try {
+        // If request is in array form
         if(Array.isArray(req.body))
         {
+            let arr = [];
             req.body.forEach(el => {
                 const sendMail = () => {
                     sendmail("prakharbhalla2016@gmail.com", el.email, el.Subject, el.body, "");
                 }
+                arr.push(el.email);
                 let time = el.Time;
                 let delay;
                 if(time === "now")
@@ -82,10 +78,13 @@ router.post("/", body("email").isEmail().withMessage("Enter valid email"), async
                     let present = Date.now();
                     delay = schedule - present - (5.5*60*60*1000);
                 }
-                console.log("d:", delay/1000);
+                // Time interval after which mail will be sent
+                console.log("delay in sec:", delay/1000);
                 setTimeout(sendMail, delay);
             });
+            res.status(201).send(`Mails set successfully to ${arr.join(",")}`);
         }
+        // if request is in object form
         else
         {
             const sendMail = () => {
@@ -109,10 +108,11 @@ router.post("/", body("email").isEmail().withMessage("Enter valid email"), async
                 let present = Date.now();
                 delay = schedule - present - (5.5*60*60*1000);
             }
+            // Time interval after which mail will be sent
             console.log("delay in sec:", delay/1000);
             setTimeout(sendMail, delay);
+            res.status(201).send(`Mail set successfully to ${req.body.email}`);
         }
-        res.status(201).send(`Mails set into queue successfully`);
     } catch(e) {
         res.status(500).send("Something went wrong");
     }
